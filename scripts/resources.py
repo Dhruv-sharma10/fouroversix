@@ -79,7 +79,7 @@ def get_image(  # noqa: C901
         .apt_install("clang", "git")
         .pip_install_from_pyproject(
             "pyproject.toml",
-            optional_dependencies=["fast-build", "test"],
+            optional_dependencies=["tests"],
         )
         .uv_pip_install("numpy", "wheel")
         .uv_pip_install(

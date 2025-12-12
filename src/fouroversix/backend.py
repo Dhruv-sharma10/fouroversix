@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Any
 
 import torch
+import torch.nn.functional as F  # noqa: N812
 
 from .utils import AdaptiveBlockScalingRule, DataType, FP4Format, RoundStyle
 
@@ -133,27 +134,39 @@ class MatmulBackend(str, Enum):
                 msg = f"Invalid fp4_format: {fp4_format}"
                 raise ValueError(msg)
 
-            if out_shape is not None:
-                return out[: out_shape[0], : out_shape[1]]
-
-            return out
+            return out[: out_shape[0], : out_shape[1]] if out_shape is not None else out
 
         if self == MatmulBackend.pytorch:
             from .quantize.reference import dequantize_from_fp4, from_blocked
 
             a = dequantize_from_fp4(
                 a_e2m1,
-                from_blocked(a_sf, (a_e2m1.shape[0], a_e2m1.shape[1] // 8)),
+                from_blocked(
+                    a_sf,
+                    (a_e2m1.shape[0], a_e2m1.shape[1] // fp4_format.block_size() * 2),
+                ),
                 a_normconst,
+                fp4_format=fp4_format,
             )
-
             b = dequantize_from_fp4(
                 b_e2m1,
-                from_blocked(b_sf, (b_e2m1.shape[0], b_e2m1.shape[1] // 8)),
+                from_blocked(
+                    b_sf,
+                    (b_e2m1.shape[0], b_e2m1.shape[1] // fp4_format.block_size() * 2),
+                ),
                 b_normconst,
+                fp4_format=fp4_format,
             )
 
-            return a @ b.T
+            # Fix mismatched shapes introduced by padding during quantization
+            if a.shape[1] > b.shape[1]:
+                b = F.pad(b, (0, a.shape[1] - b.shape[1]))
+            elif b.shape[1] > a.shape[1]:
+                a = F.pad(a, (0, b.shape[1] - a.shape[1]))
+
+            out = a @ b.T
+
+            return out[: out_shape[0], : out_shape[1]] if out_shape is not None else out
 
         msg = f"Invalid backend: {self}"
         raise ValueError(msg)
@@ -193,7 +206,7 @@ class QuantizeBackend(str, Enum):
         self,
         x: torch.Tensor,
         *,
-        scale_rule: AdaptiveBlockScalingRule = (AdaptiveBlockScalingRule.always_6),
+        scale_rule: AdaptiveBlockScalingRule = AdaptiveBlockScalingRule.always_6,  # noqa: ARG002
         block_scale_2d: bool = False,
         had: torch.Tensor | None = None,
         fp4_format: FP4Format = FP4Format.nvfp4,
@@ -225,9 +238,7 @@ class QuantizeBackend(str, Enum):
             )
 
         if self == QuantizeBackend.pytorch:
-            return (scale_rule == AdaptiveBlockScalingRule.always_6) and (
-                x.shape[1] % 16 == 0
-            )
+            return True
 
         if self == QuantizeBackend.triton:
             if not torch.cuda.is_available() or torch.cuda.get_device_capability()[
@@ -247,7 +258,7 @@ class QuantizeBackend(str, Enum):
         self,
         x: torch.Tensor,
         *,
-        scale_rule: AdaptiveBlockScalingRule = (AdaptiveBlockScalingRule.always_6),
+        scale_rule: AdaptiveBlockScalingRule = AdaptiveBlockScalingRule.always_6,
         block_scale_2d: bool = False,
         had: torch.Tensor | None = None,
         fp4_format: FP4Format = FP4Format.nvfp4,
@@ -287,6 +298,20 @@ class QuantizeBackend(str, Enum):
         if self == QuantizeBackend.pytorch:
             from .quantize.reference import quantize_to_fp4
 
+            rows_div = 128
+            cols_div = 64
+
+            if x.shape[0] % rows_div != 0 or x.shape[1] % cols_div != 0:
+                x = F.pad(
+                    x,
+                    (
+                        0,
+                        cols_div - (x.shape[1] % cols_div),
+                        0,
+                        rows_div - (x.shape[0] % rows_div),
+                    ),
+                )
+
             return quantize_to_fp4(
                 x,
                 had=had,
@@ -306,7 +331,7 @@ def quantize_to_fp4(
     x: torch.Tensor,
     *,
     backend: QuantizeBackend | None = None,
-    scale_rule: AdaptiveBlockScalingRule = (AdaptiveBlockScalingRule.always_6),
+    scale_rule: AdaptiveBlockScalingRule = AdaptiveBlockScalingRule.always_6,
     block_scale_2d: bool = False,
     had: torch.Tensor | None = None,
     fp4_format: FP4Format = FP4Format.nvfp4,

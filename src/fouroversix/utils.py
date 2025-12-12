@@ -61,6 +61,22 @@ class FP4Format(str, Enum):
     mxfp4 = "mxfp4"
     nvfp4 = "nvfp4"
 
+    def block_size(self) -> int:
+        """Return the block size for the FP4 format."""
+
+        return {
+            FP4Format.mxfp4: 32,
+            FP4Format.nvfp4: 16,
+        }[self]
+
+    def scale_dtype(self) -> torch.dtype:
+        """Return the scale dtype for the FP4 format."""
+
+        return {
+            FP4Format.mxfp4: torch.float8_e8m0fnu,
+            FP4Format.nvfp4: torch.float8_e4m3fn,
+        }[self]
+
 
 class RoundStyle(str, Enum):
     """

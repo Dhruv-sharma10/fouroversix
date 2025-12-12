@@ -73,7 +73,7 @@ def worker(gpu_id: str, task_queue: multiprocessing.Queue) -> dict[str, Any]:
         )
 
         logs_path = Path("ptq_logs") / (
-            f"{model_name}_{ptq_method.value}-{datetime.now(tz=tzlocal).strftime('%Y%m%d%H%M%S')}.json"
+            f"{model_name}_{ptq_method.value}-{datetime.now(tz=tzlocal()).strftime('%Y%m%d%H%M%S')}.json"
         )
         logs_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -88,3 +88,5 @@ def worker(gpu_id: str, task_queue: multiprocessing.Queue) -> dict[str, Any]:
                 f,
                 indent=4,
             )
+
+        print("Saved PTQ results to", logs_path)
