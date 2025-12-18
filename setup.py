@@ -16,7 +16,7 @@ from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
 BASE_WHEEL_URL = "https://github.com/mit-han-lab/fouroversix/releases/download"
 PACKAGE_NAME = "fouroversix"
-PACKAGE_VERSION = "0.2.0.dev6"
+PACKAGE_VERSION = "0.2.0.dev7"
 
 FORCE_BUILD = os.getenv("FORCE_BUILD", "0") == "1"
 FORCE_CXX11_ABI = os.getenv("FORCE_CXX11_ABI", "0") == "1"
@@ -115,7 +115,7 @@ def get_wheel_url() -> tuple[str, str]:
     cuda_version = f"cu{torch_cuda_version.major}"
 
     wheel_filename = (
-        f"{PACKAGE_NAME}-{PACKAGE_VERSION}-{cuda_version}torch{torch_version}"
+        f"{PACKAGE_NAME}-{PACKAGE_VERSION}+{cuda_version}torch{torch_version}"
         f"cxx11abi{cxx11_abi}-{python_version}-{python_version}-{platform_name}.whl"
     )
 
