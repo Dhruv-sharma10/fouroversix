@@ -195,27 +195,27 @@ def quantize_bf16_to_scaled_fp4(
         )
 
     if scale_rule == AdaptiveBlockScalingRule.always_4:
-        x_quantized = x_quantized_4.bfloat16()
+        x_quantized = x_quantized_4
+        scales = x_scales_4
     elif scale_rule == AdaptiveBlockScalingRule.always_6:
-        x_quantized = x_quantized_6.bfloat16()
+        x_quantized = x_quantized_6
+        scales = x_scales_6
     else:
         select_4 = (x_error_4 < x_error_6)[:, None]
-        x_quantized = (
-            torch.where(
-                select_4,
-                x_quantized_4.reshape(-1, 16),
-                x_quantized_6.reshape(-1, 16),
-            )
-            .reshape_as(x)
-            .bfloat16()
+        x_quantized = torch.where(
+            select_4,
+            x_quantized_4.reshape(-1, 16),
+            x_quantized_6.reshape(-1, 16),
         )
-        x_quantized = pack_unpacked_fp4(quantize_bf16_to_unpacked_fp4(x_quantized))
         scales = torch.where(
             select_4,
             x_scales_4.reshape(-1, 1),
             x_scales_6.reshape(-1, 1),
         )
 
+    x_quantized = pack_unpacked_fp4(
+        quantize_bf16_to_unpacked_fp4(x_quantized.bfloat16().reshape_as(x)),
+    )
     reshaped_scales = to_blocked(
         scales.reshape(
             x.shape[0],
